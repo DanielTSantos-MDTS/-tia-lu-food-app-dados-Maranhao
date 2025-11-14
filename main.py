@@ -7,6 +7,8 @@ fila_pendentes = []
 fila_aceitos = []
 fila_prontos = []
 
+# simular pull request
+
 # def criarPedido1():
 # Um item possúi um número(ID), possúi ao menos um item mas pode ter múltiplos
 # O usuário vai escolher a quantidade do item e então o preço vai ser multiplicado proporcionalmente
