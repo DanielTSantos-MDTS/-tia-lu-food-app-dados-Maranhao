@@ -2,7 +2,7 @@
 
 ## 👥 Equipe
 - Membro 1: Daniel Teixeira Santos
-- Membro 2: __________________
+- Membro 2: Augusto Santos de Oliveira
 - Membro 3: __________________
 - Membro 4: __________________
 - Membro 5: __________________
