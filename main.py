@@ -43,6 +43,7 @@ pedidos_prontos = [p for p in pedidos if p["pedidoStatus"] == "PRONTO"]
 esperando_entregador = [p for p in pedidos if p["pedidoStatus"] == "ESPERANDO ENTREGADOR"]
 saida_entrega = [p for p in pedidos if p["pedidoStatus"] == "SAIDA PARA ENTREGA"]
 pedidos_entregues = [p for p in pedidos if p["pedidoStatus"] == "ENTREGUE"]
+pedidos_rejeitados = [p for p in pedidos if p["pedidoStatus"] == "REJEITADO"]
 
 def menu_principal():
     while True:
@@ -469,11 +470,14 @@ def processar_pedidos_pendentes():
             pedidos[pedidoIndex]["pedidoStatus"] = "ACEITO"
             pedidos_aceitos.append(pedidos[pedidoIndex])
             pedidos_pendentes.pop(pedidoIndex)
+            attPedidos()
             print("Pedido Aceito e movido para preparo!")
             input("Pressione ENTER para continuar")
         elif action == "N":
-            pedidos_pendentes.pop(pedidoIndex)
             pedidos[pedidoIndex]["pedidoStatus"] = "REJEITADO"
+            pedidos_rejeitados.append(pedidos[pedidoIndex])
+            pedidos_pendentes.pop(pedidoIndex)
+            attPedidos()
             print("Pedido Rejeitado")
             input("Pressione ENTER para continuar")
             
@@ -485,7 +489,6 @@ def processar_pedidos_pendentes():
     attPedidos()
 
 def atualizar_pedido():
-
     print(".======================.")
     print("|   Atualizar Pedido   |")
     print(".======================.")
@@ -506,7 +509,7 @@ def atualizar_pedido():
                 )
 
     pedidoAtualizar = int(
-        input("Digite número do pedido para atualizar (0 para voltar): ")
+        input("Digite número do pedido para atualizar (0 para voltar): ") # se apertar enter com ele vazio, dá erro
     )
 
     pedido_encontrado = None
@@ -545,6 +548,7 @@ def atualizar_pedido():
                 if ped["idPedido"] == pedidoAtualizar:
                     pedidos_aceitos.pop(idx)
                     break
+            attPedidos()
             print("Pedido Atualizado com Sucesso!")
             input("Pressione ENTER para continuar...")
             return
@@ -555,6 +559,7 @@ def atualizar_pedido():
                 if ped["idPedido"] == pedidoAtualizar:
                     pedidos_fazendo.pop(idx)
                     break
+            attPedidos()
             print("Pedido Atualizado com Sucesso!")
             input("Pressione ENTER para continuar...")
             return
@@ -565,6 +570,7 @@ def atualizar_pedido():
                 if ped["idPedido"] == pedidoAtualizar:
                     pedidos_prontos.pop(idx)
                     break
+            attPedidos()
             print("Pedido Atualizado com Sucesso!")
             input("Pressione ENTER para continuar...")
             return
@@ -575,6 +581,7 @@ def atualizar_pedido():
                 if ped["idPedido"] == pedidoAtualizar:
                     esperando_entregador.pop(idx)
                     break
+            attPedidos()
             print("Pedido Atualizado com Sucesso!")
             input("Pressione ENTER para continuar...")
             return
@@ -585,6 +592,7 @@ def atualizar_pedido():
                 if ped["idPedido"] == pedidoAtualizar:
                     saida_entrega.append(idx)
                     break
+            attPedidos()
             print("Pedido Atualizado com Sucesso!")
             input("Pressione ENTER para continuar...")
             return
@@ -592,6 +600,7 @@ def atualizar_pedido():
             print("Opção inválida!")
             input("Pressione ENTER para continuar...")
             atualizar_pedido()
+            attPedidos()
             return
     attPedidos()
 
@@ -606,7 +615,7 @@ def cancelar_pedido():
         return
 
     for pedido in pedidos:
-        if pedido["pedidoStatus"] == "Pendente" or pedido["pedidoStatus"] == "Aceito":
+        if pedido["pedidoStatus"] == "PENDENTE" or pedido["pedidoStatus"] == "ACEITO":
             print(
                 f"| Número do pedido: {pedido['idPedido']} | Status: {pedido['pedidoStatus']} |"
             )
@@ -616,7 +625,7 @@ def cancelar_pedido():
                     f"| {item['itemNome']} x{item['itemQuantidade']} | Preço unitário: R${item['precoUnitario']:.2f} | Subtotal: R${item['totalItem']:.2f} |"
                 )
 
-    pedidoCancelar = int(input("Número do pedido a Cancelar (0 para voltar): "))
+    pedidoCancelar = int(input("Número do pedido a Cancelar (0 para voltar): ")) # se der enter com valor vazio, dá erro
 
     if pedidoCancelar == 0:
         clear()
