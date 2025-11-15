@@ -1,0 +1,17 @@
+[
+    {
+        "idPedido": 1,
+        "pedidoQuantidade": 0,
+        "pedidoItens": [
+            {
+                "itemID": 1,
+                "itemNome": "Coca-Cola",
+                "itemQuantidade": 5,
+                "precoUnitario": 10.0,
+                "totalItem": 50.0
+            }
+        ],
+        "pedidoStatus": "Pendente",
+        "totalPedido": 50.0
+    }
+]

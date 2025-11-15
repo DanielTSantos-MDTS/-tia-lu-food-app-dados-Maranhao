@@ -1,0 +1,9 @@
+[
+    {
+        "itemID": 1,
+        "itemNome": "Coca-Cola",
+        "itemDescri": "Refri",
+        "itemPreco": 10.0,
+        "itemEstoque": 55
+    }
+]

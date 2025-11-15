@@ -9,11 +9,18 @@ def carregarItens():
             return json.load(arq)
     except FileNotFoundError:
         return []
-itens = []
+    
+def carregarPedidos():
+    try:
+        with open('pedidos.json', 'r', encoding='utf-8') as arq:
+            return json.load(arq)
+    except FileNotFoundError:
+        return []
+    
+
 itens = carregarItens() # Recebe os valores que já estão salvos e os carrega
+pedidos = carregarPedidos()
 
-
-pedidos = []
 fila_pendentes = []
 fila_aceitos = []
 fila_prontos = []
@@ -71,13 +78,15 @@ def criarPedido():
 
             quantidade = int(input("Quantidade: "))
             if (
-                quantidade < 1
-                or quantidade > itens[indexItem]["itemEstoque"]
+                quantidade < 1 or quantidade > itens[indexItem]["itemEstoque"]
             ):
                 print("Quantidade inválida!")
                 input("Pressione qualquer tecla para continuar...")
                 continue
             itens[indexItem]["itemEstoque"] -= quantidade
+            # Atualiza a quantidade conforme o pedido
+            with open('itens.json', 'w', encoding='utf-8') as arq:
+                json.dump(itens, arq, indent=4, ensure_ascii = False)
 
             item = {
                 "itemID": itens[indexItem]["itemID"],
@@ -89,6 +98,8 @@ def criarPedido():
 
             pedido["pedidoItens"].append(item)  # aparece na tela
             pedido["totalPedido"] += item["totalItem"]
+
+
 
             os.system("cls")  # limpa a tela
             print(f"| Número do pedido: {pedido['idPedido']} |")
@@ -105,6 +116,9 @@ def criarPedido():
             print("Valor inválido!")
             input("Pressione qualquer tecla para continuar...")
             os.system("cls")
+        #Escrever os pedidos no .json
+    with open('pedidos.json', 'w', encoding='utf-8') as arq:
+        json.dump(pedidos, arq, indent=4, ensure_ascii = False)
 
 
 def mostrarPedido():
