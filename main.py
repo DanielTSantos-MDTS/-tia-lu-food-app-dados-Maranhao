@@ -16,10 +16,15 @@ def carregarPedidos(): # faz o mesmo só que com os pedidos cadastrados
             return json.load(arqu)
     except FileNotFoundError:
         return []
-    
-def atualizaItens():
+
+# atualiza os respectivos arquivos .json conforme alteração
+def attItens():
     with open('itens.json', 'w', encoding='utf-8') as arqu:
         json.dump(itens, arqu, indent=4, ensure_ascii=False)
+
+def attPedidos():
+    with open('pedidos.json', 'w', encoding='utf-8') as arqu:
+        json.dump(pedidos, arqu, indent=4, ensure_ascii=False)
 
 def clear():
     if platform.system() == "Windows":
@@ -198,7 +203,7 @@ def cadastrarItem():
 
     itens.append(item)
     # escreve as informações da lista itens dentro de um arquivo json
-    atualizaItens()
+    attItens()
     print("Item cadastrado com sucesso!")
     input("Pressione ENTER para confirmar")
 
@@ -249,7 +254,7 @@ def atualizarItem():
 
             # reescrevendo o item escolhido dentro do itens.json
             # atualizando informações
-            atualizaItens()
+            attItens()
             
             print(
                 f"Item atualizado: | ID: {itens[itemID-1]['itemID']} | Nome: {itens[itemID-1]['itemNome']} | Descrição: {itens[itemID-1]['itemDescri']} | Preço: R${itens[itemID-1]['itemPreco']} | Estoque: {itens[itemID-1]['itemEstoque']}UN |"
@@ -359,7 +364,7 @@ def criarPedido():
                 return
             itens[indexItem]["itemEstoque"] -= quantidade
             # atualiza a quantidade dentro do itens.json
-            atualizaItens()
+            attItens()
 
             item = {
                 "itemID": itens[indexItem]["itemID"],
@@ -472,7 +477,7 @@ def processar_pedidos_pendentes():
             input("Pressione ENTER para continuar")
 
         break
-
+    attPedidos()
 
 def atualizar_pedido():
 
