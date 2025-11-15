@@ -438,9 +438,13 @@ def processar_pedidos_pendentes():
             print(
                 f"| Número do pedido: {pedido['idPedido']} | Status: {pedido['pedidoStatus']}"
             )
-        pedidoProcessar = int(
-            input("Digite o número do pedido a ser processado (0 para voltar): ")
-        )
+        pedidoProcessar = input("Digite o número do pedido a ser processado (0 para voltar): ")
+
+        if not pedidoProcessar.isdigit():
+            print("Valor inválido, finalizando o sistema!")
+            return 
+
+        pedidoProcessar = int(pedidoProcessar)
 
         if pedidoProcessar == 0:
             return
@@ -508,11 +512,15 @@ def atualizar_pedido():
                     f"| {item['itemNome']} x{item['itemQuantidade']} | Preço unitário: R${item['precoUnitario']:.2f} | Subtotal: R${item['totalItem']:.2f} |"
                 )
 
-    pedidoAtualizar = int(
-        input("Digite número do pedido para atualizar (0 para voltar): ") # se apertar enter com ele vazio, dá erro
-    )
+    pedidoAtualizar = input("Digite número do pedido para atualizar (0 para voltar): ")
 
-    pedido_encontrado = None
+    if not pedidoAtualizar.isdigit():
+            print("Valor inválido, finalizando o sistema!")
+            return 
+
+    pedidoAtualizar = int(pedidoAtualizar)
+
+    pedidoEncontrado = None
     pedidoIndex = None
     
     if pedidoAtualizar == 0:
@@ -520,12 +528,12 @@ def atualizar_pedido():
         return
     
     for i, p in enumerate(pedidos):
-        if p["idPedido"] == pedidoAtualizar and p["pedidoStatus"] == "ACEITO":
-            pedido_encontrado = p
+        if p["idPedido"] == pedidoAtualizar and p["pedidoStatus"] != "PENDENTE" or p["pedidoStatus"] != "REJEITADO":
+            pedidoEncontrado = p
             pedidoIndex = i
             break
     
-    if pedido_encontrado is None:
+    if pedidoEncontrado is None:
         print("Esse pedido não foi aceito ou não existe!")
         input("Pressione ENTER para continuar...")
         return atualizar_pedido()
@@ -625,16 +633,30 @@ def cancelar_pedido():
                     f"| {item['itemNome']} x{item['itemQuantidade']} | Preço unitário: R${item['precoUnitario']:.2f} | Subtotal: R${item['totalItem']:.2f} |"
                 )
 
-    pedidoCancelar = int(input("Número do pedido a Cancelar (0 para voltar): ")) # se der enter com valor vazio, dá erro
+    pedidoEncontrado = None
+    pedidoIndex = None
 
+    pedidoCancelar = input("Número do pedido a Cancelar (0 para voltar): ")
+    if not pedidoCancelar.isdigit():
+            print("Valor inválido, finalizando o sistema!")
+            return 
+
+    pedidoCancelar = int(pedidoCancelar)
+
+    for i, p in enumerate(pedidos):
+        if p["idPedido"] == pedidoCancelar and p["pedidoStatus"] == "PENDENTE" or p["pedidoStatus"] == "ACEITO":
+            pedidoEncontrado = p
+            pedidoIndex = i
+            break
+    
+    if pedidoEncontrado is None:
+        print("Esse pedido não foi aceito ou não existe!")
+        input("Pressione ENTER para continuar...")
+        return cancelar_pedido()
+    
     if pedidoCancelar == 0:
         clear()
         return
-    elif pedidoCancelar < 1 or pedidoCancelar > len(pedidos_aceitos):
-        print("Valor Inválido!")
-        input("Pressione ENTER para continuar")
-        clear()
-        cancelar_pedido()
 
     pedidoIndex = pedidoCancelar - 1
     print(
@@ -649,9 +671,11 @@ def cancelar_pedido():
         elif pedido[pedidoIndex]["pedidoStatus"] == "ACEITO":
             pedidos_aceitos.pop(pedidoIndex)
         print("Cancelamento realizado!")
+        input("Pressione ENTER para continuar")
         return
     elif action == "N":
         print("Cancelamento não realizado!")
+        input("Pressione ENTER para continuar")
         return
     else:
         print("Valor Inválido!")

@@ -3,9 +3,9 @@
 ## 👥 Equipe
 - Membro 1: Daniel Teixeira Santos
 - Membro 2: Augusto Santos de Oliveira
-- Membro 3: __________________
-- Membro 4: __________________
-- Membro 5: __________________
+- Membro 3: Mendel Kalyl
+- Membro 4: Antônio Coqueiro Costa
+- Membro 5: Vitor de Oliveira Sena
 
 ---
 
