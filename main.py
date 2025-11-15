@@ -1,7 +1,18 @@
 # menu de itens
 import os
+import json # módulo json
 
+# Lê os dados anteriormente escritos no .json e retorna os valores
+def carregarItens():
+    try:
+        with open('itens.json', 'r', encoding='utf-8') as arq:
+            return json.load(arq)
+    except FileNotFoundError:
+        return []
 itens = []
+itens = carregarItens() # Recebe os valores que já estão salvos e os carrega
+
+
 pedidos = []
 fila_pendentes = []
 fila_aceitos = []
@@ -129,6 +140,11 @@ def cadastrarItem():
     }
     
     itens.append(item)
+
+    #comentário
+    #Escrevendo a lista itens dentro do .json
+    with open('itens.json', 'w', encoding='utf-8') as arq:
+        json.dump(itens, arq, indent=4, ensure_ascii=False)
     print("Item cadastrado com sucesso!")
 
 
