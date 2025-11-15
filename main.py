@@ -1,6 +1,25 @@
 # menu de itens
 import os
 import platform
+import json
+
+def carregarItens(): # carrega os itens cadastrados ao inicializar
+    try:
+        with open('itens.json', 'r', encoding='utf-8') as arqu:
+            return json.load(arqu)
+    except FileNotFoundError: # caso não exista nenhum item cadastrado
+        return [] # ela inicializa como uma lista vazia
+    
+def carregarPedidos(): # faz o mesmo só que com os pedidos cadastrados
+    try:
+        with open('pedidos.json', 'r', encoding='utf-8') as arqu:
+            return json.load(arqu)
+    except FileNotFoundError:
+        return []
+    
+def atualizaItens():
+    with open('itens.json', 'w', encoding='utf-8') as arqu:
+        json.dump(itens, arqu, indent=4, ensure_ascii=False)
 
 def clear():
     if platform.system() == "Windows":
@@ -8,8 +27,9 @@ def clear():
     else:
         print("\033[2J\033[H", end="")
         
-itens = []
-pedidos = []
+itens = carregarItens()
+pedidos = carregarPedidos()
+
 pedidos_pendentes = []
 pedidos_aceitos = []
 pedidos_fazendo = []
@@ -177,6 +197,8 @@ def cadastrarItem():
     }
 
     itens.append(item)
+    # escreve as informações da lista itens dentro de um arquivo json
+    atualizaItens()
     print("Item cadastrado com sucesso!")
     input("Pressione ENTER para confirmar")
 
@@ -224,6 +246,11 @@ def atualizarItem():
                 "itemPreco": itemPreco,
                 "itemEstoque": itemEstoque,
             }
+
+            # reescrevendo o item escolhido dentro do itens.json
+            # atualizando informações
+            atualizaItens()
+            
             print(
                 f"Item atualizado: | ID: {itens[itemID-1]['itemID']} | Nome: {itens[itemID-1]['itemNome']} | Descrição: {itens[itemID-1]['itemDescri']} | Preço: R${itens[itemID-1]['itemPreco']} | Estoque: {itens[itemID-1]['itemEstoque']}UN |"
             )
@@ -331,6 +358,8 @@ def criarPedido():
                 input("Pressione tecla para continuar...")
                 return
             itens[indexItem]["itemEstoque"] -= quantidade
+            # atualiza a quantidade dentro do itens.json
+            atualizaItens()
 
             item = {
                 "itemID": itens[indexItem]["itemID"],
@@ -358,6 +387,9 @@ def criarPedido():
             print("Valor inválido!")
             input("Pressione ENTER para continuar...")
             clear()
+    # escreve as informações da lista pedidos dentro de um arquivo json
+    with open('pedidos.json', 'w', encoding='utf-8') as arqu:
+        json.dump(pedidos, arqu, indent=4, ensure_ascii=False)
 
 
 def mostrarPedido():
