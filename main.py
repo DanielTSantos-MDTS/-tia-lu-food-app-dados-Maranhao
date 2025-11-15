@@ -631,8 +631,8 @@ def filtrar_pedidos():
             Localizados = True
             input("Pressione ENTER para continuar...")
         
-        if not Localizados:
-            print(f"| Nenhum pedido com status {statusFiltrar} |")
-            input("Pressione ENTER para continuar...")
+    if not Localizados:
+        print(f"| Nenhum pedido com status {statusFiltrar} |")
+        input("Pressione ENTER para continuar...")
 
 menu_principal()
