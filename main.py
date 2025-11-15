@@ -192,22 +192,32 @@ def menu_consultas():
             input("Pressione ENTER para continuar")
     
 def cadastrarItem():
-    print(".====================.")
-    print("|  Cadastrar Itens  |")
-    print(".====================.")
-    item = {
-        "itemID": len(itens) + 1,
-        "itemNome": input("Nome: "),
-        "itemDescri": input("Detalhes: "),
-        "itemPreco": float(input("Preço: R$ ")),
-        "itemEstoque": int(input("Quantidade: ")),
-    }
+    while True:
+        try:
+            print(".====================.")
+            print("|  Cadastrar Itens  |")
+            print(".====================.")
+            item = {
+                "itemID": len(itens) + 1,
+                "itemNome": input("Nome: "),
+                "itemDescri": input("Detalhes: "),
+                "itemPreco": float(input("Preço: R$ ")),
+                "itemEstoque": int(input("Quantidade: ")),
+            }
 
-    itens.append(item)
-    # escreve as informações da lista itens dentro de um arquivo json
-    attItens()
-    print("Item cadastrado com sucesso!")
-    input("Pressione ENTER para confirmar")
+            itens.append(item)
+            # escreve as informações da lista itens dentro de um arquivo json
+            attItens()
+            print("Item cadastrado com sucesso!")
+            input("Pressione ENTER para confirmar")
+        except ValueError:
+            print("Digite algo válido!")
+            input("Pressione ENTER para continuar...")
+            return
+        except IndexError:
+            print("Opção inválida!")
+            input("Pressione ENTER para continuar...")
+            return
 
 
 def consultarItem():
@@ -399,7 +409,11 @@ def criarPedido():
         except ValueError:
             print("Valor inválido!")
             input("Pressione ENTER para continuar...")
-            clear()
+            return
+        except IndexError:
+            print("Opção inválida!")
+            input("Pressione ENTER para continuar...")
+            return
 attPedidos() # escreve as informações da lista pedidos dentro de um arquivo json
 
 
@@ -493,196 +507,213 @@ def processar_pedidos_pendentes():
     attPedidos()
 
 def atualizar_pedido():
-    print(".======================.")
-    print("|   Atualizar Pedido   |")
-    print(".======================.")
+    while True:
+        try:
+            print(".======================.")
+            print("|   Atualizar Pedido   |")
+            print(".======================.")
 
-    if not pedidos:
-        print("Nenhum pedido cadastrada!")
-        return
+            if not pedidos:
+                print("Nenhum pedido cadastrada!")
+                return
 
-    for pedido in pedidos:
-        if pedido["pedidoStatus"] != "PENDENTE":
-            print(
-                f"| Número do pedido: {pedido['idPedido']} | Status: {pedido['pedidoStatus']} |"
-            )
-            for item in pedido["pedidoItens"]:
+            for pedido in pedidos:
+                if pedido["pedidoStatus"] != "PENDENTE":
+                    print(
+                        f"| Número do pedido: {pedido['idPedido']} | Status: {pedido['pedidoStatus']} |"
+                    )
+                    for item in pedido["pedidoItens"]:
 
-                print(
-                    f"| {item['itemNome']} x{item['itemQuantidade']} | Preço unitário: R${item['precoUnitario']:.2f} | Subtotal: R${item['totalItem']:.2f} |"
-                )
+                        print(
+                            f"| {item['itemNome']} x{item['itemQuantidade']} | Preço unitário: R${item['precoUnitario']:.2f} | Subtotal: R${item['totalItem']:.2f} |"
+                        )
 
-    pedidoAtualizar = input("Digite número do pedido para atualizar (0 para voltar): ")
+            pedidoAtualizar = input("Digite número do pedido para atualizar (0 para voltar): ")
 
-    if not pedidoAtualizar.isdigit():
-            print("Valor inválido, finalizando o sistema!")
-            return 
+            if not pedidoAtualizar.isdigit():
+                    print("Valor inválido, finalizando o sistema!")
+                    return 
 
-    pedidoAtualizar = int(pedidoAtualizar)
+            pedidoAtualizar = int(pedidoAtualizar)
 
-    pedidoEncontrado = None
-    pedidoIndex = None
-    
-    if pedidoAtualizar == 0:
-        clear()
-        return
-    
-    for i, p in enumerate(pedidos):
-        if p["idPedido"] == pedidoAtualizar and p["pedidoStatus"] != "PENDENTE" or p["pedidoStatus"] != "REJEITADO":
-            pedidoEncontrado = p
-            pedidoIndex = i
-            break
-    
-    if pedidoEncontrado is None:
-        print("Esse pedido não foi aceito ou não existe!")
-        input("Pressione ENTER para continuar...")
-        return atualizar_pedido()
-    clear()
-    print(".===========================.")
-    print("|    Status Disponíveis:    |")
-    print("|   1 - Em Preparação       |")
-    print("|   2 - Preparo Finalizado  |")
-    print("|   3 - Esperando Entregador|")
-    print("|   4 - Saída para Entrega  |")
-    print("|   5 - Entregue            |")
-    print(".===========================.")
-
-    action = int(input("Escolha o novo status: "))
-    match action:
-        case 1:
-            pedidos[pedidoIndex]["pedidoStatus"] = "FAZENDO"
-            pedidos_fazendo.append(pedidos[pedidoIndex])
-            for idx, ped in enumerate(pedidos_aceitos):
-                if ped["idPedido"] == pedidoAtualizar:
-                    pedidos_aceitos.pop(idx)
+            pedidoEncontrado = None
+            pedidoIndex = None
+            
+            if pedidoAtualizar == 0:
+                clear()
+                return
+            
+            for i, p in enumerate(pedidos):
+                if p["idPedido"] == pedidoAtualizar and p["pedidoStatus"] != "PENDENTE" or p["pedidoStatus"] != "REJEITADO":
+                    pedidoEncontrado = p
+                    pedidoIndex = i
                     break
-            attPedidos()
-            print("Pedido Atualizado com Sucesso!")
+            
+            if pedidoEncontrado is None:
+                print("Esse pedido não foi aceito ou não existe!")
+                input("Pressione ENTER para continuar...")
+                return atualizar_pedido()
+            clear()
+            print(".===========================.")
+            print("|    Status Disponíveis:    |")
+            print("|   1 - Em Preparação       |")
+            print("|   2 - Preparo Finalizado  |")
+            print("|   3 - Esperando Entregador|")
+            print("|   4 - Saída para Entrega  |")
+            print("|   5 - Entregue            |")
+            print(".===========================.")
+
+            action = int(input("Escolha o novo status: "))
+            match action:
+                case 1:
+                    pedidos[pedidoIndex]["pedidoStatus"] = "FAZENDO"
+                    pedidos_fazendo.append(pedidos[pedidoIndex])
+                    for idx, ped in enumerate(pedidos_aceitos):
+                        if ped["idPedido"] == pedidoAtualizar:
+                            pedidos_aceitos.pop(idx)
+                            break
+                    attPedidos()
+                    print("Pedido Atualizado com Sucesso!")
+                    input("Pressione ENTER para continuar...")
+                    return
+                case 2:
+                    pedidos[pedidoIndex]["pedidoStatus"] = "PRONTO"
+                    pedidos_prontos.append(pedidos[pedidoIndex])
+                    for idx, ped in enumerate(pedidos_fazendo):
+                        if ped["idPedido"] == pedidoAtualizar:
+                            pedidos_fazendo.pop(idx)
+                            break
+                    attPedidos()
+                    print("Pedido Atualizado com Sucesso!")
+                    input("Pressione ENTER para continuar...")
+                    return
+                case 3:
+                    pedidos[pedidoIndex]["pedidoStatus"] = "ESPERANDO ENTREGADOR"
+                    esperando_entregador.append(pedidos[pedidoIndex])
+                    for idx, ped in enumerate(pedidos_prontos):
+                        if ped["idPedido"] == pedidoAtualizar:
+                            pedidos_prontos.pop(idx)
+                            break
+                    attPedidos()
+                    print("Pedido Atualizado com Sucesso!")
+                    input("Pressione ENTER para continuar...")
+                    return
+                case 4:
+                    pedidos[pedidoIndex]["pedidoStatus"] = "SAIDA PARA ENTREGA"
+                    saida_entrega.append(pedidos[pedidoIndex])
+                    for idx, ped in enumerate(esperando_entregador):
+                        if ped["idPedido"] == pedidoAtualizar:
+                            esperando_entregador.pop(idx)
+                            break
+                    attPedidos()
+                    print("Pedido Atualizado com Sucesso!")
+                    input("Pressione ENTER para continuar...")
+                    return
+                case 5:
+                    pedidos[pedidoIndex]["pedidoStatus"] = "ENTREGUE"
+                    pedidos_entregues.append(pedidos[pedidoIndex])
+                    for idx, ped in enumerate(saida_entrega):
+                        if ped["idPedido"] == pedidoAtualizar:
+                            saida_entrega.append(idx)
+                            break
+                    attPedidos()
+                    print("Pedido Atualizado com Sucesso!")
+                    input("Pressione ENTER para continuar...")
+                    return
+                case _:
+                    print("Opção inválida!")
+                    input("Pressione ENTER para continuar...")
+                    atualizar_pedido()
+                    attPedidos()
+                    return
+        except ValueError:
+            print("Digite um valor válido!")
             input("Pressione ENTER para continuar...")
-            return
-        case 2:
-            pedidos[pedidoIndex]["pedidoStatus"] = "PRONTO"
-            pedidos_prontos.append(pedidos[pedidoIndex])
-            for idx, ped in enumerate(pedidos_fazendo):
-                if ped["idPedido"] == pedidoAtualizar:
-                    pedidos_fazendo.pop(idx)
-                    break
-            attPedidos()
-            print("Pedido Atualizado com Sucesso!")
-            input("Pressione ENTER para continuar...")
-            return
-        case 3:
-            pedidos[pedidoIndex]["pedidoStatus"] = "ESPERANDO ENTREGADOR"
-            esperando_entregador.append(pedidos[pedidoIndex])
-            for idx, ped in enumerate(pedidos_prontos):
-                if ped["idPedido"] == pedidoAtualizar:
-                    pedidos_prontos.pop(idx)
-                    break
-            attPedidos()
-            print("Pedido Atualizado com Sucesso!")
-            input("Pressione ENTER para continuar...")
-            return
-        case 4:
-            pedidos[pedidoIndex]["pedidoStatus"] = "SAIDA PARA ENTREGA"
-            saida_entrega.append(pedidos[pedidoIndex])
-            for idx, ped in enumerate(esperando_entregador):
-                if ped["idPedido"] == pedidoAtualizar:
-                    esperando_entregador.pop(idx)
-                    break
-            attPedidos()
-            print("Pedido Atualizado com Sucesso!")
-            input("Pressione ENTER para continuar...")
-            return
-        case 5:
-            pedidos[pedidoIndex]["pedidoStatus"] = "ENTREGUE"
-            pedidos_entregues.append(pedidos[pedidoIndex])
-            for idx, ped in enumerate(saida_entrega):
-                if ped["idPedido"] == pedidoAtualizar:
-                    saida_entrega.append(idx)
-                    break
-            attPedidos()
-            print("Pedido Atualizado com Sucesso!")
-            input("Pressione ENTER para continuar...")
-            return
-        case _:
+            clear()
+        except IndexError:
             print("Opção inválida!")
             input("Pressione ENTER para continuar...")
-            atualizar_pedido()
-            attPedidos()
-            return
+            clear()
     attPedidos()
 
 def cancelar_pedido():
+        while True:
+            try:
+                print(".=====================.")
+                print("|   Cancelar Pedido   |")
+                print(".=====================.")
 
-    print(".=====================.")
-    print("|   Cancelar Pedido   |")
-    print(".=====================.")
+                if not pedidos:
+                    print("Nenhum Pedido Cadastrado")
+                    return
 
-    if not pedidos:
-        print("Nenhum Pedido Cadastrado")
-        return
+                for pedido in pedidos:
+                    if pedido["pedidoStatus"] == "PENDENTE" or pedido["pedidoStatus"] == "ACEITO":
+                        print(
+                            f"| Número do pedido: {pedido['idPedido']} | Status: {pedido['pedidoStatus']} |"
+                        )
+                        for item in pedido["pedidoItens"]:
 
-    for pedido in pedidos:
-        if pedido["pedidoStatus"] == "PENDENTE" or pedido["pedidoStatus"] == "ACEITO":
-            print(
-                f"| Número do pedido: {pedido['idPedido']} | Status: {pedido['pedidoStatus']} |"
-            )
-            for item in pedido["pedidoItens"]:
+                            print(
+                                f"| {item['itemNome']} x{item['itemQuantidade']} | Preço unitário: R${item['precoUnitario']:.2f} | Subtotal: R${item['totalItem']:.2f} |"
+                            )
 
+                pedidoEncontrado = None
+                pedidoIndex = None
+
+                pedidoCancelar = input("Número do pedido a Cancelar (0 para voltar): ")
+                if not pedidoCancelar.isdigit():
+                        print("Valor inválido, finalizando o sistema!")
+                        return 
+
+                pedidoCancelar = int(pedidoCancelar)
+
+                for i, p in enumerate(pedidos):
+                    if p["idPedido"] == pedidoCancelar and (p["pedidoStatus"] == "PENDENTE" or p["pedidoStatus"] == "ACEITO"):
+                        pedidoEncontrado = p
+                        pedidoIndex = i
+                        break
+                
+                if pedidoEncontrado is None:
+                    print("Esse pedido não foi aceito ou não existe!")
+                    input("Pressione ENTER para continuar...")
+                    return cancelar_pedido()
+                
+                if pedidoCancelar == 0:
+                    clear()
+                    return
+
+                pedidoIndex = pedidoCancelar - 1
                 print(
-                    f"| {item['itemNome']} x{item['itemQuantidade']} | Preço unitário: R${item['precoUnitario']:.2f} | Subtotal: R${item['totalItem']:.2f} |"
+                    f"| Número do Pedido Selecionado: {pedidos[pedidoIndex]['idPedido']} | Status: {pedidos[pedidoIndex]['pedidoStatus']} |"
                 )
-
-    pedidoEncontrado = None
-    pedidoIndex = None
-
-    pedidoCancelar = input("Número do pedido a Cancelar (0 para voltar): ")
-    if not pedidoCancelar.isdigit():
-            print("Valor inválido, finalizando o sistema!")
-            return 
-
-    pedidoCancelar = int(pedidoCancelar)
-
-    for i, p in enumerate(pedidos):
-        if p["idPedido"] == pedidoCancelar and p["pedidoStatus"] == "PENDENTE" or p["pedidoStatus"] == "ACEITO":
-            pedidoEncontrado = p
-            pedidoIndex = i
-            break
-    
-    if pedidoEncontrado is None:
-        print("Esse pedido não foi aceito ou não existe!")
-        input("Pressione ENTER para continuar...")
-        return cancelar_pedido()
-    
-    if pedidoCancelar == 0:
-        clear()
-        return
-
-    pedidoIndex = pedidoCancelar - 1
-    print(
-        f"| Número do Pedido Selecionado: {pedidos[pedidoIndex]['idPedido']} | Status: {pedidos[pedidoIndex]['pedidoStatus']} |"
-    )
-    action = input("Deseja cancelar este pedido? (S/N): ").upper()
-    if action == "S":
-        pedidos[pedidoIndex]["pedidoStatus"] = "CANCELADO"
-        pedidos.pop(pedidoIndex)
-        if pedido[pedidoIndex]["pedidoStatus"] == "PENDENTE":
-            pedidos_pendentes.pop(pedidoIndex)
-        elif pedido[pedidoIndex]["pedidoStatus"] == "ACEITO":
-            pedidos_aceitos.pop(pedidoIndex)
-        print("Cancelamento realizado!")
-        input("Pressione ENTER para continuar")
-        return
-    elif action == "N":
-        print("Cancelamento não realizado!")
-        input("Pressione ENTER para continuar")
-        return
-    else:
-        print("Valor Inválido!")
-        input("Pressione o ENTER para continuar")
-        return
-
-
+                action = input("Deseja cancelar este pedido? (S/N): ")
+                if action.upper() == "S":
+                    if pedidos[pedidoIndex]["pedidoStatus"] == "PENDENTE":
+                        pedidos_pendentes.pop(pedidoIndex)
+                        pedidos[pedidoIndex]["pedidoStatus"] = "CANCELADO"
+                    elif pedido[pedidoIndex]["pedidoStatus"] == "ACEITO":
+                        pedidos_aceitos.pop(pedidoIndex)
+                        pedidos[pedidoIndex]["pedidoStatus"] = "CANCELADO"
+                    print("Cancelamento realizado!")
+                    input("Pressione ENTER para continuar")
+                    return
+                elif action.upper() == "N":
+                    print("Cancelamento não realizado!")
+                    input("Pressione ENTER para continuar")
+                    return
+                else:
+                    print("Valor Inválido!")
+                    input("Pressione o ENTER para continuar")
+                    return
+            except ValueError:
+                print("Digite um valor válido!")
+                input("Pressione ENTER para continuar...")
+                return
+            except IndexError:
+                print("Opção inválida!")
+                input("Pressione ENTER para continuar...")
+                return
 
 def filtrar_pedidos():
     print(".=============================.")
