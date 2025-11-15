@@ -613,76 +613,73 @@ def atualizar_pedido():
     attPedidos()
 
 def cancelar_pedido():
+        print(".=====================.")
+        print("|   Cancelar Pedido   |")
+        print(".=====================.")
 
-    print(".=====================.")
-    print("|   Cancelar Pedido   |")
-    print(".=====================.")
+        if not pedidos:
+            print("Nenhum Pedido Cadastrado")
+            return
 
-    if not pedidos:
-        print("Nenhum Pedido Cadastrado")
-        return
-
-    for pedido in pedidos:
-        if pedido["pedidoStatus"] == "PENDENTE" or pedido["pedidoStatus"] == "ACEITO":
-            print(
-                f"| Número do pedido: {pedido['idPedido']} | Status: {pedido['pedidoStatus']} |"
-            )
-            for item in pedido["pedidoItens"]:
-
+        for pedido in pedidos:
+            if pedido["pedidoStatus"] == "PENDENTE" or pedido["pedidoStatus"] == "ACEITO":
                 print(
-                    f"| {item['itemNome']} x{item['itemQuantidade']} | Preço unitário: R${item['precoUnitario']:.2f} | Subtotal: R${item['totalItem']:.2f} |"
+                    f"| Número do pedido: {pedido['idPedido']} | Status: {pedido['pedidoStatus']} |"
                 )
+                for item in pedido["pedidoItens"]:
 
-    pedidoEncontrado = None
-    pedidoIndex = None
+                    print(
+                        f"| {item['itemNome']} x{item['itemQuantidade']} | Preço unitário: R${item['precoUnitario']:.2f} | Subtotal: R${item['totalItem']:.2f} |"
+                    )
 
-    pedidoCancelar = input("Número do pedido a Cancelar (0 para voltar): ")
-    if not pedidoCancelar.isdigit():
-            print("Valor inválido, finalizando o sistema!")
-            return 
+        pedidoEncontrado = None
+        pedidoIndex = None
 
-    pedidoCancelar = int(pedidoCancelar)
+        pedidoCancelar = input("Número do pedido a Cancelar (0 para voltar): ")
+        if not pedidoCancelar.isdigit():
+                print("Valor inválido, finalizando o sistema!")
+                return 
 
-    for i, p in enumerate(pedidos):
-        if p["idPedido"] == pedidoCancelar and p["pedidoStatus"] == "PENDENTE" or p["pedidoStatus"] == "ACEITO":
-            pedidoEncontrado = p
-            pedidoIndex = i
-            break
-    
-    if pedidoEncontrado is None:
-        print("Esse pedido não foi aceito ou não existe!")
-        input("Pressione ENTER para continuar...")
-        return cancelar_pedido()
-    
-    if pedidoCancelar == 0:
-        clear()
-        return
+        pedidoCancelar = int(pedidoCancelar)
 
-    pedidoIndex = pedidoCancelar - 1
-    print(
-        f"| Número do Pedido Selecionado: {pedidos[pedidoIndex]['idPedido']} | Status: {pedidos[pedidoIndex]['pedidoStatus']} |"
-    )
-    action = input("Deseja cancelar este pedido? (S/N): ").upper()
-    if action == "S":
-        pedidos[pedidoIndex]["pedidoStatus"] = "CANCELADO"
-        pedidos.pop(pedidoIndex)
-        if pedido[pedidoIndex]["pedidoStatus"] == "PENDENTE":
-            pedidos_pendentes.pop(pedidoIndex)
-        elif pedido[pedidoIndex]["pedidoStatus"] == "ACEITO":
-            pedidos_aceitos.pop(pedidoIndex)
-        print("Cancelamento realizado!")
-        input("Pressione ENTER para continuar")
-        return
-    elif action == "N":
-        print("Cancelamento não realizado!")
-        input("Pressione ENTER para continuar")
-        return
-    else:
-        print("Valor Inválido!")
-        input("Pressione o ENTER para continuar")
-        return
+        for i, p in enumerate(pedidos):
+            if p["idPedido"] == pedidoCancelar and (p["pedidoStatus"] == "PENDENTE" or p["pedidoStatus"] == "ACEITO"):
+                pedidoEncontrado = p
+                pedidoIndex = i
+                break
+        
+        if pedidoEncontrado is None:
+            print("Esse pedido não foi aceito ou não existe!")
+            input("Pressione ENTER para continuar...")
+            return cancelar_pedido()
+        
+        if pedidoCancelar == 0:
+            clear()
+            return
 
-
+        pedidoIndex = pedidoCancelar - 1
+        print(
+            f"| Número do Pedido Selecionado: {pedidos[pedidoIndex]['idPedido']} | Status: {pedidos[pedidoIndex]['pedidoStatus']} |"
+        )
+        action = input("Deseja cancelar este pedido? (S/N): ").upper()
+        if action == "S":
+            pedidos[pedidoIndex]["pedidoStatus"] = "CANCELADO"
+            pedidos.pop(pedidoIndex)
+            if pedidos[pedidoIndex]["pedidoStatus"] == "PENDENTE":
+                pedidos_pendentes.pop(pedidoIndex)
+            elif pedido[pedidoIndex]["pedidoStatus"] == "ACEITO":
+                pedidos_aceitos.pop(pedidoIndex)
+            print("Cancelamento realizado!")
+            input("Pressione ENTER para continuar")
+            return
+        elif action == "N":
+            print("Cancelamento não realizado!")
+            input("Pressione ENTER para continuar")
+            return
+        else:
+            print("Valor Inválido!")
+            input("Pressione o ENTER para continuar")
+            return
 
 def filtrar_pedidos():
     print(".=============================.")
