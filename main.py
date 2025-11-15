@@ -1,6 +1,31 @@
 # menu de itens
 import os
 import platform
+import json
+
+def carregarItens(): # carrega os itens cadastrados ao inicializar
+    try:
+        with open('itens.json', 'r', encoding='utf-8') as arqu:
+            return json.load(arqu)
+    except FileNotFoundError: # caso não exista nenhum item cadastrado
+        return [] # ela inicializa como uma lista vazia
+    
+def carregarPedidos(): # faz o mesmo só que com os pedidos cadastrados
+    try:
+        with open('pedidos.json', 'r', encoding='utf-8') as arqu:
+            return json.load(arqu)
+    except FileNotFoundError:
+        return []
+
+# atualiza os respectivos arquivos .json conforme alteração
+def attItens():
+    with open('itens.json', 'w', encoding='utf-8') as arqu:
+        json.dump(itens, arqu, indent=4, ensure_ascii=False)
+
+def attPedidos():
+    with open('pedidos.json', 'w', encoding='utf-8') as arqu:
+        json.dump(pedidos, arqu, indent=4, ensure_ascii=False)
+
 
 def clear():
     if platform.system() == "Windows":
@@ -8,15 +33,17 @@ def clear():
     else:
         print("\033[2J\033[H", end="")
         
-itens = []
-pedidos = []
-pedidos_pendentes = []
-pedidos_aceitos = []
-pedidos_fazendo = []
-pedidos_prontos = []
-esperando_entregador = []
-saida_entrega = []
-pedidos_entregues = []
+itens = carregarItens()
+pedidos = carregarPedidos()
+
+pedidos_pendentes = [p for p in pedidos if p["pedidoStatus"] == "PENDENTE"]
+pedidos_aceitos = [p for p in pedidos if p["pedidoStatus"] == "ACEITO"]
+pedidos_fazendo = [p for p in pedidos if p["pedidoStatus"] == "FAZENDO"]
+pedidos_prontos = [p for p in pedidos if p["pedidoStatus"] == "PRONTO"]
+esperando_entregador = [p for p in pedidos if p["pedidoStatus"] == "ESPERANDO ENTREGADOR"]
+saida_entrega = [p for p in pedidos if p["pedidoStatus"] == "SAIDA PARA ENTREGA"]
+pedidos_entregues = [p for p in pedidos if p["pedidoStatus"] == "ENTREGUE"]
+pedidos_rejeitados = [p for p in pedidos if p["pedidoStatus"] == "REJEITADO"]
 
 def menu_principal():
     while True:
@@ -177,6 +204,8 @@ def cadastrarItem():
     }
 
     itens.append(item)
+    # escreve as informações da lista itens dentro de um arquivo json
+    attItens()
     print("Item cadastrado com sucesso!")
     input("Pressione ENTER para confirmar")
 
@@ -224,6 +253,11 @@ def atualizarItem():
                 "itemPreco": itemPreco,
                 "itemEstoque": itemEstoque,
             }
+
+            # reescrevendo o item escolhido dentro do itens.json
+            # atualizando informações
+            attItens()
+            
             print(
                 f"Item atualizado: | ID: {itens[itemID-1]['itemID']} | Nome: {itens[itemID-1]['itemNome']} | Descrição: {itens[itemID-1]['itemDescri']} | Preço: R${itens[itemID-1]['itemPreco']} | Estoque: {itens[itemID-1]['itemEstoque']}UN |"
             )
@@ -257,13 +291,15 @@ def criarPedido():
             if addPedido == 0:
                 if pedido["pedidoItens"]:
                     pedidos.append(pedido)
+                    attPedidos() # salva os pedidos dentro do .json
+
                     clear()
                     cupom = input("| Insira o Cupom (OFF5, OFF10, OFF15, ENTER para pular):  ").upper()
                     
                     match cupom:
                         case "OFF5":
                             clear()
-                            pedido["pedidoDesconto"] = 0.5
+                            pedido["pedidoDesconto"] = 0.05
                             pedido["totalPedido"] *= (1 - pedido["pedidoDesconto"])
                             pedido["cupomAplicado"] = cupom
                             
@@ -271,6 +307,7 @@ def criarPedido():
                             print("| Pedido Realizado com Sucesso. |")
                             print(f"| Valor total do pedido: R${pedido['totalPedido']:.2f} |")
                             print("| Aguardando Aprovação |")
+                            attPedidos() # salva o desconto
                             input("Pressione ENTER para voltar ao menu principal...")
                             return
                         case "OFF10":
@@ -283,6 +320,7 @@ def criarPedido():
                             print("| Pedido Realizado com Sucesso. |")
                             print(f"| Valor total do pedido: R${pedido['totalPedido']:.2f} |")
                             print("| Aguardando Aprovação |")
+                            attPedidos() # salva o desconto
                             input("Pressione ENTER para voltar ao menu principal...")
                             return
                         case "OFF15":
@@ -304,6 +342,7 @@ def criarPedido():
                             print("| Pedido Realizado com Sucesso. |")
                             print(f"| Valor total do pedido: R${pedido['totalPedido']:.2f} |")
                             print("| Aguardando Aprovação |")
+                            attPedidos() # salva o desconto 
                             input("Pressione ENTER para voltar ao menu principal...")
                             return
                         case _:
@@ -313,6 +352,7 @@ def criarPedido():
                             print("| Pedido Realizado com Sucesso. |")
                             print(f"| Valor total do pedido: R${pedido['totalPedido']:.2f} |")
                             print("| Aguardando Aprovação |")
+                            attPedidos() # salva o desconto
                             input("Pressione ENTER para voltar ao menu principal...")
                             return
                 aberto = False
@@ -331,6 +371,8 @@ def criarPedido():
                 input("Pressione tecla para continuar...")
                 return
             itens[indexItem]["itemEstoque"] -= quantidade
+            # atualiza a quantidade dentro do itens.json
+            attItens()
 
             item = {
                 "itemID": itens[indexItem]["itemID"],
@@ -358,6 +400,7 @@ def criarPedido():
             print("Valor inválido!")
             input("Pressione ENTER para continuar...")
             clear()
+attPedidos() # escreve as informações da lista pedidos dentro de um arquivo json
 
 
 def mostrarPedido():
@@ -375,7 +418,7 @@ def mostrarPedido():
             )
 
         print(
-            f"| Descoto aplicado no pedido: {pedido["pedidoDesconto"]}"
+            f"| Desconto aplicado no pedido: {pedido["pedidoDesconto"]}"
             f"| Valor total do pedido: R${pedido['totalPedido']:.2f}")
 
     input("Pressione ENTER para continuar...")
@@ -427,11 +470,14 @@ def processar_pedidos_pendentes():
             pedidos[pedidoIndex]["pedidoStatus"] = "ACEITO"
             pedidos_aceitos.append(pedidos[pedidoIndex])
             pedidos_pendentes.pop(pedidoIndex)
+            attPedidos()
             print("Pedido Aceito e movido para preparo!")
             input("Pressione ENTER para continuar")
         elif action == "N":
-            pedidos_pendentes.pop(pedidoIndex)
             pedidos[pedidoIndex]["pedidoStatus"] = "REJEITADO"
+            pedidos_rejeitados.append(pedidos[pedidoIndex])
+            pedidos_pendentes.pop(pedidoIndex)
+            attPedidos()
             print("Pedido Rejeitado")
             input("Pressione ENTER para continuar")
             
@@ -440,10 +486,9 @@ def processar_pedidos_pendentes():
             input("Pressione ENTER para continuar")
 
         break
-
+    attPedidos()
 
 def atualizar_pedido():
-
     print(".======================.")
     print("|   Atualizar Pedido   |")
     print(".======================.")
@@ -464,7 +509,7 @@ def atualizar_pedido():
                 )
 
     pedidoAtualizar = int(
-        input("Digite número do pedido para atualizar (0 para voltar): ")
+        input("Digite número do pedido para atualizar (0 para voltar): ") # se apertar enter com ele vazio, dá erro
     )
 
     pedido_encontrado = None
@@ -503,6 +548,7 @@ def atualizar_pedido():
                 if ped["idPedido"] == pedidoAtualizar:
                     pedidos_aceitos.pop(idx)
                     break
+            attPedidos()
             print("Pedido Atualizado com Sucesso!")
             input("Pressione ENTER para continuar...")
             return
@@ -513,16 +559,18 @@ def atualizar_pedido():
                 if ped["idPedido"] == pedidoAtualizar:
                     pedidos_fazendo.pop(idx)
                     break
+            attPedidos()
             print("Pedido Atualizado com Sucesso!")
             input("Pressione ENTER para continuar...")
             return
         case 3:
-            pedidos[pedidoIndex]["pedidoStatus"] = "ESPERANDO ENTREGDOR"
+            pedidos[pedidoIndex]["pedidoStatus"] = "ESPERANDO ENTREGADOR"
             esperando_entregador.append(pedidos[pedidoIndex])
             for idx, ped in enumerate(pedidos_prontos):
                 if ped["idPedido"] == pedidoAtualizar:
                     pedidos_prontos.pop(idx)
                     break
+            attPedidos()
             print("Pedido Atualizado com Sucesso!")
             input("Pressione ENTER para continuar...")
             return
@@ -533,6 +581,7 @@ def atualizar_pedido():
                 if ped["idPedido"] == pedidoAtualizar:
                     esperando_entregador.pop(idx)
                     break
+            attPedidos()
             print("Pedido Atualizado com Sucesso!")
             input("Pressione ENTER para continuar...")
             return
@@ -543,6 +592,7 @@ def atualizar_pedido():
                 if ped["idPedido"] == pedidoAtualizar:
                     saida_entrega.append(idx)
                     break
+            attPedidos()
             print("Pedido Atualizado com Sucesso!")
             input("Pressione ENTER para continuar...")
             return
@@ -550,7 +600,9 @@ def atualizar_pedido():
             print("Opção inválida!")
             input("Pressione ENTER para continuar...")
             atualizar_pedido()
+            attPedidos()
             return
+    attPedidos()
 
 def cancelar_pedido():
 
@@ -563,7 +615,7 @@ def cancelar_pedido():
         return
 
     for pedido in pedidos:
-        if pedido["pedidoStatus"] == "Pendente" or pedido["pedidoStatus"] == "Aceito":
+        if pedido["pedidoStatus"] == "PENDENTE" or pedido["pedidoStatus"] == "ACEITO":
             print(
                 f"| Número do pedido: {pedido['idPedido']} | Status: {pedido['pedidoStatus']} |"
             )
@@ -573,7 +625,7 @@ def cancelar_pedido():
                     f"| {item['itemNome']} x{item['itemQuantidade']} | Preço unitário: R${item['precoUnitario']:.2f} | Subtotal: R${item['totalItem']:.2f} |"
                 )
 
-    pedidoCancelar = int(input("Número do pedido a Cancelar (0 para voltar): "))
+    pedidoCancelar = int(input("Número do pedido a Cancelar (0 para voltar): ")) # se der enter com valor vazio, dá erro
 
     if pedidoCancelar == 0:
         clear()
