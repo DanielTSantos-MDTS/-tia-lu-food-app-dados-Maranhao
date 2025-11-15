@@ -1,0 +1,9 @@
+[
+    {
+        "itemID": 1,
+        "itemNome": "a",
+        "itemDescri": "b",
+        "itemPreco": 2.0,
+        "itemEstoque": 78
+    }
+]

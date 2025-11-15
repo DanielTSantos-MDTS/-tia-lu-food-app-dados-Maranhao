@@ -26,6 +26,7 @@ def attPedidos():
     with open('pedidos.json', 'w', encoding='utf-8') as arqu:
         json.dump(pedidos, arqu, indent=4, ensure_ascii=False)
 
+
 def clear():
     if platform.system() == "Windows":
         os.system("cls")
@@ -35,13 +36,13 @@ def clear():
 itens = carregarItens()
 pedidos = carregarPedidos()
 
-pedidos_pendentes = []
-pedidos_aceitos = []
-pedidos_fazendo = []
-pedidos_prontos = []
-esperando_entregador = []
-saida_entrega = []
-pedidos_entregues = []
+pedidos_pendentes = [p for p in pedidos if p["pedidoStatus"] == "PENDENTE"]
+pedidos_aceitos = [p for p in pedidos if p["pedidoStatus"] == "ACEITO"]
+pedidos_fazendo = [p for p in pedidos if p["pedidoStatus"] == "FAZENDO"]
+pedidos_prontos = [p for p in pedidos if p["pedidoStatus"] == "PRONTO"]
+esperando_entregador = [p for p in pedidos if p["pedidoStatus"] == "ESPERANDO ENTREGADOR"]
+saida_entrega = [p for p in pedidos if p["pedidoStatus"] == "SAIDA PARA ENTREGA"]
+pedidos_entregues = [p for p in pedidos if p["pedidoStatus"] == "ENTREGUE"]
 
 def menu_principal():
     while True:
@@ -289,13 +290,15 @@ def criarPedido():
             if addPedido == 0:
                 if pedido["pedidoItens"]:
                     pedidos.append(pedido)
+                    attPedidos() # salva os pedidos dentro do .json
+
                     clear()
                     cupom = input("| Insira o Cupom (OFF5, OFF10, OFF15, ENTER para pular):  ").upper()
                     
                     match cupom:
                         case "OFF5":
                             clear()
-                            pedido["pedidoDesconto"] = 0.5
+                            pedido["pedidoDesconto"] = 0.05
                             pedido["totalPedido"] *= (1 - pedido["pedidoDesconto"])
                             pedido["cupomAplicado"] = cupom
                             
@@ -303,6 +306,7 @@ def criarPedido():
                             print("| Pedido Realizado com Sucesso. |")
                             print(f"| Valor total do pedido: R${pedido['totalPedido']:.2f} |")
                             print("| Aguardando Aprovação |")
+                            attPedidos() # salva o desconto
                             input("Pressione ENTER para voltar ao menu principal...")
                             return
                         case "OFF10":
@@ -315,6 +319,7 @@ def criarPedido():
                             print("| Pedido Realizado com Sucesso. |")
                             print(f"| Valor total do pedido: R${pedido['totalPedido']:.2f} |")
                             print("| Aguardando Aprovação |")
+                            attPedidos() # salva o desconto
                             input("Pressione ENTER para voltar ao menu principal...")
                             return
                         case "OFF15":
@@ -336,6 +341,7 @@ def criarPedido():
                             print("| Pedido Realizado com Sucesso. |")
                             print(f"| Valor total do pedido: R${pedido['totalPedido']:.2f} |")
                             print("| Aguardando Aprovação |")
+                            attPedidos() # salva o desconto 
                             input("Pressione ENTER para voltar ao menu principal...")
                             return
                         case _:
@@ -345,6 +351,7 @@ def criarPedido():
                             print("| Pedido Realizado com Sucesso. |")
                             print(f"| Valor total do pedido: R${pedido['totalPedido']:.2f} |")
                             print("| Aguardando Aprovação |")
+                            attPedidos() # salva o desconto
                             input("Pressione ENTER para voltar ao menu principal...")
                             return
                 aberto = False
@@ -392,9 +399,7 @@ def criarPedido():
             print("Valor inválido!")
             input("Pressione ENTER para continuar...")
             clear()
-    # escreve as informações da lista pedidos dentro de um arquivo json
-    with open('pedidos.json', 'w', encoding='utf-8') as arqu:
-        json.dump(pedidos, arqu, indent=4, ensure_ascii=False)
+attPedidos() # escreve as informações da lista pedidos dentro de um arquivo json
 
 
 def mostrarPedido():
@@ -412,7 +417,7 @@ def mostrarPedido():
             )
 
         print(
-            f"| Descoto aplicado no pedido: {pedido["pedidoDesconto"]}"
+            f"| Desconto aplicado no pedido: {pedido["pedidoDesconto"]}"
             f"| Valor total do pedido: R${pedido['totalPedido']:.2f}")
 
     input("Pressione ENTER para continuar...")
@@ -554,7 +559,7 @@ def atualizar_pedido():
             input("Pressione ENTER para continuar...")
             return
         case 3:
-            pedidos[pedidoIndex]["pedidoStatus"] = "ESPERANDO ENTREGDOR"
+            pedidos[pedidoIndex]["pedidoStatus"] = "ESPERANDO ENTREGADOR"
             esperando_entregador.append(pedidos[pedidoIndex])
             for idx, ped in enumerate(pedidos_prontos):
                 if ped["idPedido"] == pedidoAtualizar:
@@ -588,6 +593,7 @@ def atualizar_pedido():
             input("Pressione ENTER para continuar...")
             atualizar_pedido()
             return
+    attPedidos()
 
 def cancelar_pedido():
 
