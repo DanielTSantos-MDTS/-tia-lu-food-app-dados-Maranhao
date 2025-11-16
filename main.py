@@ -3,6 +3,38 @@ import os
 import platform
 import json
 
+def mergeSortPedidos(lista, numero=None): # os parametros são a lista em si e o numero, que basicamente será o critério de ordenação
+    if len(lista) <= 1: # se a lista tiver 1 ou nenhum item, ela não necessita ordenação
+        return lista
+    listaDiv = len(lista) // 2 # dividir e conquistar
+    metade1 = mergeSortPedidos(lista[:listaDiv], numero)
+    metade2 = mergeSortPedidos(lista[listaDiv:], numero)
+
+    return merge(metade1, metade2, numero)
+
+def merge(metade1, metade2, numero):
+    resultado = []
+    #i e j são ponteiros, um aponta para a metade 1 e o outro para a metade 2
+    i = j = 0 # são inicializados em 0, apontando para o primeiro item de cada metade
+    while i < len(metade1) and j < len(metade2):
+        if numero:
+            # como estamos ordenando dicionários, selecionamos as metades e as respectivas chaves
+            valorM1 = metade1[i][numero]
+            valorM2 = metade2[j][numero]
+
+        # compara os elementos das duas listas e adiciona o menor ao resultado
+        # e avança o contador
+        if valorM1 <= valorM2:
+            resultado.append(metade1[i])
+            i += 1
+        else:
+            resultado.append(metade2[j])
+            j += 1
+            
+        resultado.extend(metade1[i:])
+        resultado.extend(metade2[j:])
+        return resultado
+    
 def carregarItens(): # carrega os itens cadastrados ao inicializar
     try:
         with open('itens.json', 'r', encoding='utf-8') as arqu:
@@ -418,7 +450,11 @@ attPedidos() # escreve as informações da lista pedidos dentro de um arquivo js
 
 
 def mostrarPedido():
-    for pedido in pedidos:
+
+    # ordenar os pedidos com a função merge
+    pedidos_ordenados = mergeSortPedidos(pedidos, numero="idPedido")
+
+    for pedido in pedidos_ordenados:
         print(
             f"| Número do pedido: {pedido['idPedido']} | Status: {pedido['pedidoStatus']} "
         )
@@ -692,7 +728,7 @@ def cancelar_pedido():
                     if pedidos[pedidoIndex]["pedidoStatus"] == "PENDENTE":
                         pedidos_pendentes.pop(pedidoIndex)
                         pedidos[pedidoIndex]["pedidoStatus"] = "CANCELADO"
-                    elif pedido[pedidoIndex]["pedidoStatus"] == "ACEITO":
+                    elif pedidos[pedidoIndex]["pedidoStatus"] == "ACEITO":
                         pedidos_aceitos.pop(pedidoIndex)
                         pedidos[pedidoIndex]["pedidoStatus"] = "CANCELADO"
                     print("Cancelamento realizado!")
