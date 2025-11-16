@@ -1,7 +1,26 @@
 # menu de itens
+from arvore_avl import ArvoreAVL
+
 import os
 import platform
 import json
+
+# criação das árvores
+arvoreItens = ArvoreAVL()
+arvorePedidos = ArvoreAVL()
+
+def testeArvoreAVL():
+    # teste mecanismo arvore avl
+        print(".===== TESTANDO ÁRVORES AVL =====.")
+        print(f"Itens na árvore: {len(arvoreItens.ordenado())}")
+        print(f"Pedidos na árvore: {len(arvorePedidos.ordenado())}")
+
+        if itens:
+            testeItem = arvoreItens.buscar(itens[0]['itemID'])
+            print(f"Busca do primeiro item: {'OK!' if testeItem else 'FALHA!'}")
+
+        input('Pressione Enter para continuar...')
+        clear()
 
 def mergeSortPedidos(lista, numero=None): # os parametros são a lista em si e o numero, que basicamente será o critério de ordenação
     if len(lista) <= 1: # se a lista tiver 1 ou nenhum item, ela não necessita ordenação
@@ -30,10 +49,10 @@ def merge(metade1, metade2, numero):
         else:
             resultado.append(metade2[j])
             j += 1
-            
-        resultado.extend(metade1[i:])
-        resultado.extend(metade2[j:])
-        return resultado
+                
+    resultado.extend(metade1[i:])
+    resultado.extend(metade2[j:])
+    return resultado
     
 def carregarItens(): # carrega os itens cadastrados ao inicializar
     try:
@@ -58,7 +77,6 @@ def attPedidos():
     with open('pedidos.json', 'w', encoding='utf-8') as arqu:
         json.dump(pedidos, arqu, indent=4, ensure_ascii=False)
 
-
 def clear():
     if platform.system() == "Windows":
         os.system("cls")
@@ -68,6 +86,14 @@ def clear():
 itens = carregarItens()
 pedidos = carregarPedidos()
 
+# carrega os dados
+def carregarArvores():
+    for item in itens:
+        arvoreItens.inserir(item['itemID'], item)
+    
+    for pedido in pedidos:
+        arvorePedidos.inserir(pedido['idPedido'], pedido)
+
 pedidos_pendentes = [p for p in pedidos if p["pedidoStatus"] == "PENDENTE"]
 pedidos_aceitos = [p for p in pedidos if p["pedidoStatus"] == "ACEITO"]
 pedidos_fazendo = [p for p in pedidos if p["pedidoStatus"] == "FAZENDO"]
@@ -76,6 +102,10 @@ esperando_entregador = [p for p in pedidos if p["pedidoStatus"] == "ESPERANDO EN
 saida_entrega = [p for p in pedidos if p["pedidoStatus"] == "SAIDA PARA ENTREGA"]
 pedidos_entregues = [p for p in pedidos if p["pedidoStatus"] == "ENTREGUE"]
 pedidos_rejeitados = [p for p in pedidos if p["pedidoStatus"] == "REJEITADO"]
+
+
+
+carregarArvores()
 
 def menu_principal():
     while True:
@@ -197,6 +227,7 @@ def menu_consultas():
     print("[.=============================================================.]")
     print("[.-.-.             1 - Exibir Todos Pedidos                .-.-.]")
     print("[.-.-.             2 - Filtrar Pedidos por Status          .-.-.]")
+    print("[.-.-.             3 - Recurso Árvore AVL [TESTE]          .-.-.]")
     print("[.-.-.             0 - Menu Principal                      .-.-.]")
     print("[.=============================================================.]")
     
@@ -214,6 +245,9 @@ def menu_consultas():
         case 2:
             clear()
             filtrar_pedidos()
+        case 3:
+            clear()
+            testeArvoreAVL()
         case 0:
             print("Voltando para o menu principal")
             input("Pressione ENTER para confirmar")
@@ -224,7 +258,6 @@ def menu_consultas():
             input("Pressione ENTER para continuar")
     
 def cadastrarItem():
-    while True:
         try:
             print(".====================.")
             print("|  Cadastrar Itens  |")
@@ -240,16 +273,17 @@ def cadastrarItem():
             itens.append(item)
             # escreve as informações da lista itens dentro de um arquivo json
             attItens()
+            arvoreItens.inserir(item['itemID'], item)
+
             print("Item cadastrado com sucesso!")
             input("Pressione ENTER para confirmar")
+            clear()
         except ValueError:
             print("Digite algo válido!")
             input("Pressione ENTER para continuar...")
-            return
         except IndexError:
             print("Opção inválida!")
             input("Pressione ENTER para continuar...")
-            return
 
 
 def consultarItem():
@@ -299,7 +333,8 @@ def atualizarItem():
             # reescrevendo o item escolhido dentro do itens.json
             # atualizando informações
             attItens()
-            
+            arvoreItens.inserir(itemID, itens[itemID - 1])
+
             print(
                 f"Item atualizado: | ID: {itens[itemID-1]['itemID']} | Nome: {itens[itemID-1]['itemNome']} | Descrição: {itens[itemID-1]['itemDescri']} | Preço: R${itens[itemID-1]['itemPreco']} | Estoque: {itens[itemID-1]['itemEstoque']}UN |"
             )
@@ -334,7 +369,7 @@ def criarPedido():
                 if pedido["pedidoItens"]:
                     pedidos.append(pedido)
                     attPedidos() # salva os pedidos dentro do .json
-
+                    arvorePedidos.inserir(pedido['idPedido'], pedido)
                     clear()
                     cupom = input("| Insira o Cupom (OFF5, OFF10, OFF15, ENTER para pular):  ").upper()
                     
