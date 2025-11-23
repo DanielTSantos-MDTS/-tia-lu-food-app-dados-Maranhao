@@ -10,6 +10,7 @@ arvoreItens = ArvoreAVL()
 arvorePedidos = ArvoreAVL()
 
 def testeArvoreAVL():
+    try:
     # teste mecanismo arvore avl
         print(".===== TESTANDO ÁRVORES AVL =====.")
         print(f"Itens na árvore: {len(arvoreItens.ordenado())}")
@@ -19,8 +20,38 @@ def testeArvoreAVL():
             testeItem = arvoreItens.buscar(itens[0]['itemID'])
             print(f"Busca do primeiro item: {'OK!' if testeItem else 'FALHA!'}")
 
+        print("1. Buscar item por ID")
+        print("2. Buscar pedido por índice")
+        opc = int(input("Escolha uma Opção: "))
+        match opc:
+            case 1:
+                idProcurar = int(input("Digite o ID do item desejado: "))
+                itemAchado = arvoreItens.buscar(idProcurar)
+                if itemAchado:
+                    print("Item Encontrado!")
+                    input("Pressione ENTER para continuar...")
+                    print(f"| ID: {itemAchado['itemID']} | Nome: {itemAchado['itemNome']} | Descrição: {itemAchado['itemDescri']} | Preço: R$ {itemAchado['itemPreco']} | Estoque: {itemAchado['itemEstoque']} UN |")
+                else:
+                    print("Item não encontrado...")
+            case 2:
+                idProcurar = int(input("Digite o número do pedido desejado: "))
+                pedidoAchado = arvorePedidos.buscar(idProcurar)
+                if pedidoAchado:
+                    print("Pedido encontrado!")
+                    input("Pressione ENTER para continuar...")
+                    print(f"| Número do pedido: {pedidoAchado['idPedido']} | Status: {pedidoAchado['pedidoStatus']} ")
+                else:
+                    print("Item não encontrado...")
         input('Pressione Enter para continuar...')
         clear()
+
+    except ValueError:
+        print("Digite algo válido!")
+        input("Pressione ENTER para continuar...")
+    except IndexError:
+        print("Opção inválida!")
+        input("Pressione ENTER para continuar...")
+
 
 def mergeSortPedidos(lista, numero=None): # os parametros são a lista em si e o numero, que basicamente será o critério de ordenação
     if len(lista) <= 1: # se a lista tiver 1 ou nenhum item, ela não necessita ordenação
@@ -227,7 +258,7 @@ def menu_consultas():
     print("[.=============================================================.]")
     print("[.-.-.             1 - Exibir Todos Pedidos                .-.-.]")
     print("[.-.-.             2 - Filtrar Pedidos por Status          .-.-.]")
-    print("[.-.-.             3 - Recurso Árvore AVL [TESTE]          .-.-.]")
+    print("[.-.-.             3 - Recurso Árvore AVL                  .-.-.]")
     print("[.-.-.             0 - Menu Principal                      .-.-.]")
     print("[.=============================================================.]")
     
